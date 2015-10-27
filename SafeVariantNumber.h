@@ -53,8 +53,11 @@ typedef boost::variant<
 SafeVariantNumber;
 
 
-//-------------------------------------------------------------------
-
+///
+/// Conversion to another type.
+/// It prevents unexpected data loss, particularly when performing narrowing or signedness conversions of numeric data types.
+/// It throws a rangeException when an illegal operation is requested.
+///
 template<typename T> T convert(SafeVariantNumber& any ) { return 0; }
 
 template<> int8_t  convert<int8_t>(SafeVariantNumber& any )    {  return  boost::apply_visitor(convert_int8_t(), any ); }
@@ -74,23 +77,29 @@ template<> uint64_t convert<uint64_t>(SafeVariantNumber& any ) {  return  boost:
 template<> double convert<double>(SafeVariantNumber& any )     {  return  boost::apply_visitor(convert_double(), any ); }
 
 #endif
-//-------------------------------------------------------------------
 
+///
+/// \brief Compare the value of two SafeVariantNumbers. Their type might differ.
+///
 bool operator == ( SafeVariantNumber& lhs,  SafeVariantNumber& rhs )
 {
     return  boost::apply_visitor( are_equals(), lhs, rhs );
 }
 
-//-------------------------------------------------------------------
 
-
+///
+/// \brief Create an appropriate string to represent the original type.
+///
 std::string to_string( SafeVariantNumber& val)
 {
     return boost::apply_visitor (to_string_visitor(), val );
 }
 
-//-------------------------------------------------------------------
 
+///
+/// \brief This function extracts the original value assigned to the SafeVariantNumber.
+/// If the type doesn't match, it fails
+///
 template<typename T> T extract(SafeVariantNumber& i )
 {
     return boost::get<T>( i );
