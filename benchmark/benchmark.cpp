@@ -15,55 +15,42 @@ using namespace VariantNumber;
 
 static void BM_VariantAssign(benchmark::State& state)
 {
-    VarNumber a[MAX];
+    VarNumber a;
 
     while (state.KeepRunning())
     {
         for(int i=0; i<MAX; i++)
         {
-             a[i] = (int32_t)42 ;
+            benchmark::DoNotOptimize(  a = (int32_t)42 );
         }
     }
 }
 
 
-//-----------------------------------------------
-
 static void BM_VariantExtract(benchmark::State& state)
 {
-    VarNumber a[MAX];
-    int32_t total = 0;
-
-    if (state.thread_index == 0) {
-        for(int i=0; i<MAX; i++) a[i] = int32_t(42);
-    }
+    VarNumber a = (int32_t)42;
+    int64_t total = 0;
 
     while (state.KeepRunning())
     {
-        total = 0;
         for(int i=0; i<MAX; i++)
         {
-            benchmark::DoNotOptimize( total += a[i].extract<int32_t>( ) );
+            benchmark::DoNotOptimize( total += a.extract<int32_t>( ) );
         }
     }
 }
 
 static void BM_VariantConvert(benchmark::State& state)
 {
-    VarNumber a[MAX];
-
-    if (state.thread_index == 0) {
-        for(int i=0; i<MAX; i++) a[i] = int32_t(42);
-    }
-
+    VarNumber a = (int32_t)42;
     int64_t total = 0;
 
     while (state.KeepRunning())
     {
-        total = 0;
         for(int i=0; i<MAX; i++)
         {
-            benchmark::DoNotOptimize( total += a[i].convert<uint8_t>(  ) );
+            benchmark::DoNotOptimize( total += a.convert<uint8_t>(  ) );
         }
     }
 }
@@ -73,15 +60,13 @@ static void BM_VariantConvert(benchmark::State& state)
 
 static void BM_DynamicAssign(benchmark::State& state)
 {
-    Poco::Dynamic::Var  a[ MAX];
-
-    int64_t total = 0;
+    Poco::Dynamic::Var  a;
 
     while (state.KeepRunning())
     {
         for(int i=0; i<MAX; i++)
         {
-            a[i] = int32_t(42);
+             benchmark::DoNotOptimize( a = int32_t(42) );
         }
     }
 }
@@ -89,40 +74,28 @@ static void BM_DynamicAssign(benchmark::State& state)
 
 static void BM_DynamicExtract(benchmark::State& state)
 {
-    Poco::Dynamic::Var  a[ MAX];
-
-    if (state.thread_index == 0) {
-        for(int i=0; i<MAX; i++) a[i] = int32_t(42);
-    }
-
+    Poco::Dynamic::Var a = int32_t(42);
     int64_t total = 0;
 
     while (state.KeepRunning())
     {
-        total = 0;
         for(int i=0; i<MAX; i++)
         {
-            benchmark::DoNotOptimize( total +=  a[i].extract<int32_t>( ) );
+            benchmark::DoNotOptimize( total += a.extract<int32_t>( ) );
         }
     }
 }
 
 static void BM_DynamicConvert(benchmark::State& state)
 {
-    Poco::Dynamic::Var  a[ MAX];
-
-    if (state.thread_index == 0) {
-        for(int i=0; i<MAX; i++) a[i] = int32_t(42);
-    }
-
+    Poco::Dynamic::Var a = int32_t(42);
     int64_t total = 0;
 
     while (state.KeepRunning())
     {
-        total = 0;
         for(int i=0; i<MAX; i++)
         {
-            benchmark::DoNotOptimize( total += a[i].convert<uint8_t>( ) );
+            benchmark::DoNotOptimize( total += a.convert<uint8_t>( ) );
         }
     }
 }
