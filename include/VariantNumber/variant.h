@@ -42,6 +42,7 @@ public:
 
     template<typename T> VarNumber(T value)
     {
+		STATIC_ASSERT (std::numeric_limits<T>::is_specialized, _NOT_A_NUMBER);
         assign(value);
     }
 
