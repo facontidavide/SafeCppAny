@@ -7,7 +7,7 @@ In short:
 * When _extracting_ a value, it is compile-time type-safe. 
 * When _converting_ to a different type, it prevents unexpected data loss, particularly when performing narrowing or signedness conversions of numeric data types. 
 * It doesn't use pointers and heap memory. Therefore an array/vector of SafeVariantNumber(s) will be cache-friendly.
-* It is a fast as limit checking and metaprogramming allows to be.
+* It is as fast as limit checking and metaprogramming allow to be.
 
 ## Dependencies
 SafeVariantNumber is based on __Boost::Variant__. No other dependencies are needed.
