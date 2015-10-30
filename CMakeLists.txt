@@ -1,4 +1,4 @@
-project(VariadicNumber)
+project(SafeVariadicNumber)
 cmake_minimum_required(VERSION 2.8)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
