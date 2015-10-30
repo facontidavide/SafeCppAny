@@ -1,6 +1,6 @@
 # SafeVariantNumber
 The purpose of this tiny header-only library is to provide a type called SafeVariantNumber which can hold any integral or floating point number.
-Additionally it provides a safe way to convert a value between the original type and a different one.
+Additionally, it provides a safe way to convert a value between the original type and a different one.
 
 In short:
 
@@ -9,15 +9,11 @@ In short:
 * It doesn't use pointers and heap memory. Therefore an array/vector of SafeVariantNumber(s) will be cache-friendly.
 * It is as fast as limit checking and metaprogramming allow to be.
 
-## Dependencies
-SafeVariantNumber is based on __Boost::Variant__. No other dependencies are needed.
-
 ## Implementation 
-SafeVariantNumber is nothing more than a [Boost::Variant](http://www.boost.org/doc/libs/1_59_0/doc/html/variant.html). The visitors are inspired by [Poco::DynamicAny](http://pocoproject.org/docs-1.4.6/Poco.DynamicAny.html).
-I was an happy user of DynamicAny, that by the way is far more complete and flexible than SafeVariantNumber, but I didn like the fact that pointers are the cornerstone of the type erasure strategy.
-In hard real-time applications you want to avoid heap memory allocation and page faults.
-
-Preliminary results show that __SafeVariantNumber__ seems to be __4X-5X__ time faster than __Poco::DynamicAny__.
+SafeVariantNumber is strongly inspired by [Boost::Variant](http://www.boost.org/doc/libs/1_59_0/doc/html/variant.html). The implementation of the visitors, on the other hand, is based on [Poco::DynamicAny](http://pocoproject.org/docs-1.4.6/Poco.DynamicAny.html).
+Both these libraries are much more flexible than SafeVariantNumber, is __way__ faster, maintaining the same level of type safety. 
+The main drawback of Poco::DynamicAny is that it requires heap allocation, something that is slow and not very cache-friendly.
+Boost::variant doesn't have this problem, but it use more memory because of the ["Never-Empty Guarantee"](http://www.boost.org/doc/libs/1_59_0/doc/html/variant/design.html#variant.design.never-empty).
 
 ## Todo
 Lot of stuff... in particular a proper benchmark of SafeVariantNumber vs Poco::DynamicAny.
