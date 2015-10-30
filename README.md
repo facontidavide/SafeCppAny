@@ -13,7 +13,7 @@ In short:
 SafeVariantNumber is strongly inspired by [Boost::Variant](http://www.boost.org/doc/libs/1_59_0/doc/html/variant.html). The implementation of the visitors, on the other hand, is based on [Poco::DynamicAny](http://pocoproject.org/docs-1.4.6/Poco.DynamicAny.html).
 Both these libraries are much more flexible than SafeVariantNumber, is __way__ faster, maintaining the same level of type safety. 
 The main drawback of Poco::DynamicAny is that it requires heap allocation, something that is slow and not very cache-friendly.
-Boost::variant doesn't have this problem, but it use more memory because of the ["Never-Empty Guarantee"](http://www.boost.org/doc/libs/1_59_0/doc/html/variant/design.html#variant.design.never-empty).
+Boost::variant doesn't have this problem, but it uses more memory because of the ["Never-Empty Guarantee"](http://www.boost.org/doc/libs/1_59_0/doc/html/variant/design.html#variant.design.never-empty).
 
 ## Todo
 Lot of stuff... in particular a proper benchmark of SafeVariantNumber vs Poco::DynamicAny.
