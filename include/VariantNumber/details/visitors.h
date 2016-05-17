@@ -41,51 +41,51 @@ template <typename Derived, typename T> class basic_visitor
 {
 public:
 
-    T operator()(int8_t & i)   const
+    T operator()(const int8_t & i)   const
     {
         return Derived()(i);
     }
-    T operator()(int16_t & i)  const
+    T operator()(const int16_t & i)  const
     {
         return Derived()(i);
     }
-    T operator()(int32_t & i)  const
-    {
-        return Derived()(i);
-    }
-
-    T operator()(uint8_t & i)  const
-    {
-        return Derived()(i);
-    }
-    T operator()(uint16_t & i) const
-    {
-        return Derived()(i);
-    }
-    T operator()(uint32_t & i) const
+    T operator()(const int32_t & i)  const
     {
         return Derived()(i);
     }
 
-    T operator()(float & i)    const
+    T operator()(const uint8_t & i)  const
+    {
+        return Derived()(i);
+    }
+    T operator()(const uint16_t & i) const
+    {
+        return Derived()(i);
+    }
+    T operator()(const uint32_t & i) const
     {
         return Derived()(i);
     }
 
-#ifdef USE_64BITS
-    T operator()(int64_t & i)  const
+    T operator()(const float & i)    const
     {
-        return static_cast<Derived*>(this)->operator()(i);
+        return Derived()(i);
     }
-    T operator()(uint64_t & i) const
+
+    T operator()(const int64_t & i)  const
     {
-        return static_cast<Derived*>(this)->operator()(i);
+        return Derived()(i);
     }
-    T operator()(double & i)   const
+
+    T operator()(const uint64_t & i) const
     {
-        return static_cast<Derived*>(this)->operator()(i);
+        return Derived()(i);
     }
-#endif
+
+    T operator()(const double & i)   const
+    {
+        return Derived()(i);
+    }
 
 };
 
@@ -93,55 +93,55 @@ public:
 //----------------------------------------------------------------------------------------
 
 
-class convert_to_int8: public basic_visitor<convert_to_int8,int8_t>
+class convert_to_int8: public basic_visitor<convert_to_int8, int8_t>
 {
 public:
 
-    int8_t operator()(int8_t & i)   const
+    int8_t operator()(const int8_t & i)   const
     {
         return i;
     }
-    int8_t operator()(int16_t & i)  const
+    int8_t operator()(const int16_t & i)  const
     {
         return convertToSmaller<int16_t, int8_t>( i );
     }
-    int8_t operator()(int32_t & i)  const
+    int8_t operator()(const int32_t & i)  const
     {
         return convertToSmaller<int32_t, int8_t>( i );
     }
 
-    int8_t operator()(uint8_t & i)  const
+    int8_t operator()(const uint8_t & i)  const
     {
         return convertUnsignedToSigned<uint8_t,  int8_t>( i );
     }
-    int8_t operator()(uint16_t & i) const
+    int8_t operator()(const uint16_t & i) const
     {
         return convertUnsignedToSigned<uint16_t, int8_t>( i );
     }
-    int8_t operator()(uint32_t & i) const
+    int8_t operator()(const uint32_t & i) const
     {
         return convertUnsignedToSigned<uint32_t, int8_t>( i );
     }
 
-    int8_t operator()(float & i)    const
+    int8_t operator()(const float & i)    const
     {
         return convertToSmaller<float,int8_t>( i );
     }
 
-#ifdef USE_64BITS
-    int8_t operator()(int64_t & i)  const
+
+    int8_t operator()(const int64_t & i)  const
     {
         return convertToSmaller<int64_t, int8_t>( i );
     }
-    int8_t operator()(uint64_t & i) const
+    int8_t operator()(const uint64_t & i) const
     {
         return convertUnsignedToSigned<uint64_t, int8_t>( i );
     }
-    int8_t operator()(double & i)   const
+    int8_t operator()(const double & i)   const
     {
         return convertToSmaller<double,int8_t>( i );
     }
-#endif
+
 
 };
 
@@ -149,51 +149,52 @@ class convert_to_int16: public basic_visitor<convert_to_int16,int16_t>
 {
 public:
 
-    int16_t operator()(int8_t & i)   const
+    int16_t operator()(const int8_t & i)   const
     {
         return i;
     }
-    int16_t operator()(int16_t & i)  const
+    int16_t operator()(const int16_t & i)  const
     {
         return i;
     }
-    int16_t operator()(int32_t & i)  const
+    int16_t operator()(const int32_t & i)  const
     {
         return convertToSmaller<int32_t,int16_t>( i );
     }
 
-    int16_t operator()(uint8_t & i)  const
+    int16_t operator()(const uint8_t & i)  const
     {
         return convertUnsignedToSigned<uint8_t,  int16_t>( i );
     }
-    int16_t operator()(uint16_t & i) const
+    int16_t operator()(const uint16_t & i) const
     {
         return convertUnsignedToSigned<uint16_t, int16_t>( i );
     }
-    int16_t operator()(uint32_t & i) const
+    int16_t operator()(const uint32_t & i) const
     {
         return convertUnsignedToSigned<uint32_t, int16_t>( i );
     }
 
-    int16_t operator()(float & i)    const
+    int16_t operator()(const float & i)    const
     {
         return convertToSmaller<float,int16_t>( i );
     }
 
-#ifdef USE_64BITS
-    int16_t operator()(int64_t & i)  const
+    int16_t operator()(const int64_t & i)  const
     {
         return convertToSmaller<int64_t, int16_t>( i );
     }
-    int16_t operator()(uint64_t & i) const
+
+    int16_t operator()(const uint64_t & i) const
     {
         return convertUnsignedToSigned<uint64_t, int16_t>( i );
     }
-    int16_t operator()(double & i)   const
+
+    int16_t operator()(const double & i)   const
     {
         return convertToSmaller<double, int16_t>( i );
     }
-#endif
+
 
 };
 
@@ -201,51 +202,56 @@ class convert_to_int32: public basic_visitor<convert_to_int32,int32_t>
 {
 public:
 
-    int32_t operator()(int8_t & i)   const
-    {
-        return i;
-    }
-    int32_t operator()(int16_t & i)  const
-    {
-        return i;
-    }
-    int32_t operator()(int32_t & i)  const
+    int32_t operator()(const int8_t & i)   const
     {
         return i;
     }
 
-    int32_t operator()(uint8_t & i)  const
+    int32_t operator()(const int16_t & i)  const
+    {
+        return i;
+    }
+
+    int32_t operator()(const int32_t & i)  const
+    {
+        return i;
+    }
+
+    int32_t operator()(const uint8_t & i)  const
     {
         return convertUnsignedToSigned<uint8_t,  int32_t>( i );
     }
-    int32_t operator()(uint16_t & i) const
+
+    int32_t operator()(const uint16_t & i) const
     {
         return convertUnsignedToSigned<uint16_t, int32_t>( i );
     }
-    int32_t operator()(uint32_t & i) const
+
+    int32_t operator()(const uint32_t & i) const
     {
         return convertUnsignedToSigned<uint32_t, int32_t>( i );
     }
 
-    int32_t operator()(float & i)    const
+    int32_t operator()(const float & i)    const
     {
         return convertToSmaller<float, int32_t>( i );
     }
 
-#ifdef USE_64BITS
-    int32_t operator()(int64_t & i)  const
+    int32_t operator()(const int64_t & i)  const
     {
         return convertToSmaller<int64_t, int32_t>( i );
     }
-    int32_t operator()(uint64_t & i) const
+
+    int32_t operator()(const uint64_t & i) const
     {
         return convertUnsignedToSigned<uint64_t, int32_t>( i );
     }
-    int32_t operator()(double & i)   const
+
+    int32_t operator()(const double & i)   const
     {
         return convertToSmaller<double, int32_t>( i );
     }
-#endif
+
 };
 
 //-------------------------------------------------------------------
@@ -253,51 +259,49 @@ class convert_to_uint8: public basic_visitor<convert_to_uint8,uint8_t>
 {
 public:
 
-    uint8_t operator()(int8_t & i)   const
+    uint8_t operator()(const int8_t & i)   const
     {
         return convertSignedToUnsigned<int8_t,  uint8_t>( i );
     }
-    uint8_t operator()(int16_t & i)  const
+    uint8_t operator()(const int16_t & i)  const
     {
         return convertSignedToUnsigned<int16_t, uint8_t>( i );
     }
-    uint8_t operator()(int32_t & i)  const
+    uint8_t operator()(const int32_t & i)  const
     {
         return convertSignedToUnsigned<int32_t, uint8_t>( i );
     }
 
-    uint8_t operator()(uint8_t & i)  const
+    uint8_t operator()(const uint8_t & i)  const
     {
         return i;
     }
-    uint8_t operator()(uint16_t & i) const
+    uint8_t operator()(const uint16_t & i) const
     {
         return convertToSmallerUnsigned<uint16_t, uint8_t>( i );
     }
-    uint8_t operator()(uint32_t & i) const
+    uint8_t operator()(const uint32_t & i) const
     {
         return convertToSmallerUnsigned<uint32_t, uint8_t>( i );
     }
 
-    uint8_t operator()(float & i)    const
+    uint8_t operator()(const float & i)    const
     {
         return convertSignedFloatToUnsigned<float, uint8_t>( i );
     }
 
-#ifdef USE_64BITS
-    uint8_t operator()(int64_t & i)  const
+    uint8_t operator()(const int64_t & i)  const
     {
         return convertSignedToUnsigned<int64_t, uint8_t>( i );
     }
-    uint8_t operator()(uint64_t & i) const
+    uint8_t operator()(const uint64_t & i) const
     {
         return convertToSmallerUnsigned<uint64_t, uint8_t>( i );
     }
-    uint8_t operator()(double & i)   const
+    uint8_t operator()(const double & i)   const
     {
         return convertSignedFloatToUnsigned<double, uint8_t>( i );
     }
-#endif
 
 };
 
@@ -305,51 +309,49 @@ class convert_to_uint16: public basic_visitor<convert_to_uint16,uint16_t>
 {
 public:
 
-    uint16_t operator()(int8_t & i)   const
+    uint16_t operator()(const int8_t & i)   const
     {
         return convertSignedToUnsigned<int8_t,  uint16_t>( i );
     }
-    uint16_t operator()(int16_t & i)  const
+    uint16_t operator()(const int16_t & i)  const
     {
         return convertSignedToUnsigned<int16_t, uint16_t>( i );
     }
-    uint16_t operator()(int32_t & i)  const
+    uint16_t operator()(const int32_t & i)  const
     {
         return convertSignedToUnsigned<int32_t, uint16_t>( i );
     }
 
-    uint16_t operator()(uint8_t & i)  const
+    uint16_t operator()(const uint8_t & i)  const
     {
         return i;
     }
-    uint16_t operator()(uint16_t & i) const
+    uint16_t operator()(const uint16_t & i) const
     {
         return i;
     }
-    uint16_t operator()(uint32_t & i) const
+    uint16_t operator()(const uint32_t & i) const
     {
         return convertToSmallerUnsigned<uint32_t, uint16_t>( i );
     }
 
-    uint16_t operator()(float & i)    const
+    uint16_t operator()(const float & i)    const
     {
         return convertSignedFloatToUnsigned<float, uint16_t>( i );
     }
 
-#ifdef USE_64BITS
-    uint16_t operator()(int64_t & i)  const
+    uint16_t operator()(const int64_t & i)  const
     {
         return convertSignedToUnsigned<int64_t, uint16_t>( i );
     }
-    uint16_t operator()(uint64_t & i) const
+    uint16_t operator()(const uint64_t & i) const
     {
         return convertToSmallerUnsigned<uint64_t, uint16_t>( i );
     }
-    uint16_t operator()(double & i)   const
+    uint16_t operator()(const double & i)   const
     {
         return convertSignedFloatToUnsigned<double, uint16_t>( i );
     }
-#endif
 
 };
 
@@ -357,105 +359,103 @@ class convert_to_uint32: public basic_visitor<convert_to_uint32,uint32_t>
 {
 public:
 
-    uint32_t operator()(int8_t & i)   const
+    uint32_t operator()(const int8_t & i)   const
     {
         return convertSignedToUnsigned<int8_t,  uint32_t>( i );
     }
-    uint32_t operator()(int16_t & i)  const
+    uint32_t operator()(const int16_t & i)  const
     {
         return convertSignedToUnsigned<int16_t, uint32_t>( i );
     }
-    uint32_t operator()(int32_t & i)  const
+    uint32_t operator()(const int32_t & i)  const
     {
         return convertSignedToUnsigned<int32_t, uint32_t>( i );
     }
 
-    uint32_t operator()(uint8_t & i)  const
+    uint32_t operator()(const uint8_t & i)  const
     {
         return i;
     }
-    uint32_t operator()(uint16_t & i) const
+    uint32_t operator()(const uint16_t & i) const
     {
         return i;
     }
-    uint32_t operator()(uint32_t & i) const
+    uint32_t operator()(const uint32_t & i) const
     {
         return i;
     }
 
-    uint32_t operator()(float & i)    const
+    uint32_t operator()(const float & i)    const
     {
         return convertSignedFloatToUnsigned<float, uint32_t>( i );
     }
 
-#ifdef USE_64BITS
-    uint32_t operator()(int64_t & i)  const
+    uint32_t operator()(const int64_t & i)  const
     {
         return convertSignedToUnsigned<int64_t, uint32_t>( i );
     }
-    uint32_t operator()(uint64_t & i) const
+    uint32_t operator()(const uint64_t & i) const
     {
         return convertToSmallerUnsigned<uint64_t, uint32_t>( i );
     }
-    uint32_t operator()(double & i)   const
+    uint32_t operator()(const double & i)   const
     {
         return convertSignedFloatToUnsigned<double, uint32_t>( i );
     }
-#endif
+
 
 };
 
-#ifdef USE_64BITS
 
 class convert_int64_t: public basic_visitor<convert_int64_t,int64_t>
 {
 public:
 
-    int64_t operator()(int8_t & i)   const
+    int64_t operator()(const int8_t & i)   const
     {
         return i;
     }
-    int64_t operator()(int16_t & i)  const
+    int64_t operator()(const int16_t & i)  const
     {
         return i;
     }
-    int64_t operator()(int32_t & i)  const
+    int64_t operator()(const int32_t & i)  const
     {
         return i;
     }
 
-    int64_t operator()(uint8_t & i)  const
+    int64_t operator()(const uint8_t & i)  const
     {
         return convertUnsignedToSigned<uint8_t,  int64_t>( i );
     }
-    int64_t operator()(uint16_t & i) const
+    int64_t operator()(const uint16_t & i) const
     {
         return convertUnsignedToSigned<uint16_t, int64_t>( i );
     }
-    int64_t operator()(uint32_t & i) const
+    int64_t operator()(const uint32_t & i) const
     {
         return convertUnsignedToSigned<uint32_t, int64_t>( i );
     }
 
-    int64_t operator()(float & i)    const
+    int64_t operator()(const float & i)    const
     {
         return convertToSmaller<float, int64_t>( i );
     }
 
-#ifdef USE_64BITS
-    int64_t operator()(int64_t & i)  const
+
+    int64_t operator()(const int64_t & i)  const
     {
         return i;
     }
-    int64_t operator()(uint64_t & i) const
+    int64_t operator()(const uint64_t & i) const
     {
         return convertUnsignedToSigned<uint64_t, int64_t>( i );
     }
-    int64_t operator()(double & i)   const
+    int64_t operator()(const double & i)   const
     {
         return convertToSmaller<double, int64_t>( i );
     }
-#endif
+
 };
 
 
@@ -463,52 +463,52 @@ class convert_uint64_t: public basic_visitor<convert_uint64_t,uint64_t>
 {
 public:
 
-    uint64_t operator()(int8_t & i)   const
+    uint64_t operator()(const int8_t & i)   const
     {
         return convertSignedToUnsigned<int8_t,  uint64_t>( i );
     }
-    uint64_t operator()(int16_t & i)  const
+    uint64_t operator()(const int16_t & i)  const
     {
         return convertSignedToUnsigned<int16_t, uint64_t>( i );
     }
-    uint64_t operator()(int32_t & i)  const
+    uint64_t operator()(const int32_t & i)  const
     {
         return convertSignedToUnsigned<int32_t, uint64_t>( i );
     }
 
-    uint64_t operator()(uint8_t & i)  const
+    uint64_t operator()(const uint8_t & i)  const
     {
         return i;
     }
-    uint64_t operator()(uint16_t & i) const
+    uint64_t operator()(const uint16_t & i) const
     {
         return i;
     }
-    uint64_t operator()(uint32_t & i) const
+    uint64_t operator()(const uint32_t & i) const
     {
         return i;
     }
 
-    uint64_t operator()(float & i)    const
+    uint64_t operator()(const float & i)    const
     {
         return convertSignedFloatToUnsigned<float, uint64_t>( i );
     }
 
-    uint64_t operator()(int64_t & i)  const
+    uint64_t operator()(const int64_t & i)  const
     {
         return convertSignedToUnsigned<int64_t, uint64_t>( i );
     }
-    uint64_t operator()(uint64_t & i) const
+    uint64_t operator()(const uint64_t & i) const
     {
         return i;
     }
-    uint64_t operator()(double & i)   const
+    uint64_t operator()(const double & i)   const
     {
         return convertSignedFloatToUnsigned<double, uint64_t>( i );
     }
 };
 
-#endif
+
 
 //-------------------------------------------------------------------
 
@@ -516,105 +516,103 @@ class convert_to_float: public basic_visitor<convert_to_float,float>
 {
 public:
 
-    float operator()(int8_t & i)   const
+    float operator()(const int8_t & i)   const
     {
         return static_cast<float>(i);
     }
-    float operator()(int16_t & i)  const
+    float operator()(const int16_t & i)  const
     {
         return static_cast<float>(i);
     }
-    float operator()(int32_t & i)  const
-    {
-        return static_cast<float>(i);
-    }
-
-    float operator()(uint8_t & i)  const
-    {
-        return static_cast<float>(i);
-    }
-    float operator()(uint16_t & i) const
-    {
-        return static_cast<float>(i);
-    }
-    float operator()(uint32_t & i) const
+    float operator()(const int32_t & i)  const
     {
         return static_cast<float>(i);
     }
 
-    float operator()(float & i)    const
+    float operator()(const uint8_t & i)  const
+    {
+        return static_cast<float>(i);
+    }
+    float operator()(const uint16_t & i) const
+    {
+        return static_cast<float>(i);
+    }
+    float operator()(const uint32_t & i) const
+    {
+        return static_cast<float>(i);
+    }
+
+    float operator()(const float & i)    const
     {
         return i;
     }
 
-#ifdef USE_64BITS
-    float operator()(int64_t & i)  const
+    float operator()(const int64_t & i)  const
     {
         return static_cast<float>(i);
     }
-    float operator()(uint64_t & i) const
+    float operator()(const uint64_t & i) const
     {
         return static_cast<float>(i);
     }
-    float operator()(double & i)   const
+    float operator()(const double & i)   const
     {
         return static_cast<float>(i);
     }
-#endif
+
 };
 
-#ifdef USE_64BITS
 
 class convert_double: public basic_visitor<convert_double,double>
 {
 public:
 
-    double operator()(int8_t & i)   const
+    double operator()(const int8_t & i)   const
     {
         return static_cast<double>(i);
     }
-    double operator()(int16_t & i)  const
+    double operator()(const int16_t & i)  const
     {
         return static_cast<double>(i);
     }
-    double operator()(int32_t & i)  const
-    {
-        return static_cast<double>(i);
-    }
-
-    double operator()(uint8_t & i)  const
-    {
-        return static_cast<double>(i);
-    }
-    double operator()(uint16_t & i) const
-    {
-        return static_cast<double>(i);
-    }
-    double operator()(uint32_t & i) const
+    double operator()(const int32_t & i)  const
     {
         return static_cast<double>(i);
     }
 
-    double operator()(float & i)    const
+    double operator()(const uint8_t & i)  const
+    {
+        return static_cast<double>(i);
+    }
+    double operator()(const uint16_t & i) const
+    {
+        return static_cast<double>(i);
+    }
+    double operator()(const uint32_t & i) const
+    {
+        return static_cast<double>(i);
+    }
+
+    double operator()(const float & i)    const
     {
         return i;
     }
 
-    double operator()(int64_t & i)  const
+    double operator()(const int64_t & i)  const
     {
         return static_cast<double>(i);
     }
-    double operator()(uint64_t & i) const
+    double operator()(const uint64_t & i) const
     {
         return static_cast<double>(i);
     }
-    double operator()(double & i)   const
+    double operator()(const double & i)   const
     {
         return static_cast<double>(i);
     }
 };
 
-#endif
+
 
 class to_string_visitor: public basic_visitor<to_string_visitor,std::string>
 {
@@ -628,52 +626,50 @@ private:
 
 public:
 
-    std::string operator()(int8_t & i)    const
+    std::string operator()(const int8_t & i)    const
     {
         return format("%d", i);
     }
-    std::string operator()(int16_t & i)   const
+    std::string operator()(const int16_t & i)   const
     {
         return format("%d", i);
     }
-    std::string operator()(int32_t & i)   const
+    std::string operator()(const int32_t & i)   const
     {
         return format("%ld", i);
     }
 
-    std::string operator()(uint8_t & i)   const
+    std::string operator()(const uint8_t & i)   const
     {
         return format("%u", i);
     }
-    std::string operator()(uint16_t & i)  const
+    std::string operator()(const uint16_t & i)  const
     {
         return format("%u", i);
     }
-    std::string operator()(uint32_t & i)  const
+    std::string operator()(const uint32_t & i)  const
     {
         return format("%lu", i);
     }
 
-    std::string operator()(float & i)     const
+    std::string operator()(const float & i)     const
     {
         return format("%f", i);
     }
 
-#ifdef USE_64BITS
-    std::string operator()(int64_t & i)    const
+    std::string operator()(const int64_t & i)    const
     {
         return format("%ld", i);
     }
-    std::string operator()(uint64_t & i)   const
+    std::string operator()(const uint64_t & i)   const
     {
         return format("%lu", i);
     }
-    std::string operator()(double & i)     const
+    std::string operator()(const double & i)     const
     {
         return format("%f", i);
     }
 
-#endif
 };
 
 class are_equals: public basic_visitor<are_equals,bool>
@@ -681,7 +677,7 @@ class are_equals: public basic_visitor<are_equals,bool>
 public:
 
     template <typename T, typename U>
-    bool operator()( const T & lhs, const U & rhs ) const
+    bool operator()(const T & lhs, const U & rhs ) const
     {
         return lhs == rhs ;
     }
