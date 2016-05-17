@@ -16,8 +16,6 @@ find_package(benchmark)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/include )
 
 
-#add_executable(test_variant test.cpp )
-#TARGET_LINK_LIBRARIES( test_variant  )
 
 if( POCO_FOUND AND BENCHMARK_FOUND )
 
@@ -28,5 +26,9 @@ if( POCO_FOUND AND BENCHMARK_FOUND )
 
 endif()
 
+
+
+add_executable(test test/test_variantnumber.cpp )
+TARGET_LINK_LIBRARIES( test  )
 
 
