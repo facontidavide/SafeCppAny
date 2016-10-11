@@ -4,6 +4,7 @@
 #include <type_traits>
 #include "VariantNumber/typeid.h"
 #include "VariantNumber/details/visitors.h"
+#include "VariantNumber/details/exceptions.h"
 
 namespace VariantNumber
 {
@@ -30,11 +31,11 @@ public:
         return _raw_data[8];
     }
 
-    template<typename T> T convert( )
-    {
+    template<typename T> T convert( );
+    /*{
         static_assert (std::numeric_limits<T>::is_specialized, "no specialization found for this type");
         return 0;
-    }
+    }*/
 
     template<typename T> T extract( )
     {
