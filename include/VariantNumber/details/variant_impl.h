@@ -21,69 +21,11 @@ template <typename Derived,typename T> T  VarNumber::apply_visitor( basic_visito
     case Real32:  return visitor( * reinterpret_cast<const float *>( _raw_data) );
     case Real64:  return visitor( * reinterpret_cast<const double *>( _raw_data) );
 
-    default:   return 0;
+    default:  throw TypeException("ops");
 
     }
-}
-
-template <> inline void VarNumber::assign<int8_t>(const int8_t& value)
-{
-    *reinterpret_cast<int8_t *>( _raw_data ) =  value;
-    _raw_data[8] = Int8;
-}
-
-template <> inline void VarNumber::assign<int16_t>(const int16_t& value)
-{
-    *reinterpret_cast<int16_t *>( _raw_data ) =  value;
-    _raw_data[8] = Int16;
-}
-
-template <> inline void VarNumber::assign<int32_t>(const int32_t& value)
-{
-    *reinterpret_cast<int32_t *>( _raw_data ) =  value;
-    _raw_data[8] = Int32;
-}
-
-template <> inline void VarNumber::assign<int64_t>(const int64_t& value)
-{
-   *reinterpret_cast<int64_t *>( _raw_data ) =  value;
-    _raw_data[8] = Int64;
-}
-
-template <> inline void VarNumber::assign<uint8_t>(const uint8_t& value)
-{
-    *reinterpret_cast<uint8_t *>( _raw_data ) =  value;
-    _raw_data[8] = UInt8;
-}
-
-template <> inline void VarNumber::assign<uint16_t>(const uint16_t& value)
-{
-    *reinterpret_cast<uint16_t *>( _raw_data ) =  value;
-    _raw_data[8] = UInt16;
-}
-
-template <> inline void VarNumber::assign<uint32_t>(const uint32_t& value)
-{
-    *reinterpret_cast<uint32_t *>( _raw_data ) =  value;
-    _raw_data[8] = UInt32;
-}
-
-template <> inline void VarNumber::assign<uint64_t>(const uint64_t& value)
-{
-     *reinterpret_cast<uint64_t *>( _raw_data ) =  value;
-    _raw_data[8] = UInt64;
-}
-
-template <> inline void VarNumber::assign<float>(const float& value)
-{
-    *reinterpret_cast<float *>( _raw_data ) =  value;
-    _raw_data[8] = Real32;
-}
-
-template <> inline void VarNumber::assign<double>(const double& value)
-{
-    *reinterpret_cast<double *>( _raw_data ) =  value;
-    _raw_data[8] = Real64;
+    // you are not supposed to reach this point
+    return 0;
 }
 
 //------------------------------------------------------
@@ -137,8 +79,6 @@ template<> double VarNumber::convert<double>()
 }
 
 
-
-} //end namespace
 
 #endif // VARIANT_H
 

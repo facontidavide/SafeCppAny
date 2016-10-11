@@ -1,6 +1,7 @@
 #ifndef VARIANT_H
 #define VARIANT_H
 
+#include <type_traits>
 #include "VariantNumber/typeid.h"
 #include "VariantNumber/details/visitors.h"
 
@@ -20,7 +21,7 @@ public:
 
     template<typename T> VarNumber(T value)
     {
-        STATIC_ASSERT (std::numeric_limits<T>::is_specialized, _NOT_A_NUMBER);
+        static_assert (std::numeric_limits<T>::is_specialized, "not a number");
         assign(value);
     }
 
@@ -31,13 +32,13 @@ public:
 
     template<typename T> T convert( )
     {
-        STATIC_ASSERT (std::numeric_limits<T>::is_specialized, _NOT_A_NUMBER);
+        static_assert (std::numeric_limits<T>::is_specialized, "no specialization found for this type");
         return 0;
     }
 
     template<typename T> T extract( )
     {
-        STATIC_ASSERT (std::numeric_limits<T>::is_specialized, _NOT_A_NUMBER);
+        static_assert (std::numeric_limits<T>::is_specialized, "not a number");
 
         if( _raw_data[8] != getTypeID<T>() )
         {
@@ -46,11 +47,11 @@ public:
         return * reinterpret_cast<const T*>( _raw_data );
     }
 
-    template <typename T> void assign(const T& )
+    template <typename T> void assign(const T& value)
     {
-        STATIC_ASSERT (std::numeric_limits<T>::is_specialized, _NOT_A_NUMBER);
-        _raw_data[8] = UNKNOWN_TYPE;
-        throw TypeException("ops");
+        static_assert (std::numeric_limits<T>::is_specialized, "not a number");
+        *reinterpret_cast<T *>( _raw_data ) =  value;
+        _raw_data[8] = getTypeID<T>() ;
     }
 
 private:
@@ -65,5 +66,8 @@ private:
 
 #include "VariantNumber/details/variant_impl.h"
 
-#endif // VARIANT_H
 
+
+} //end namespace
+
+#endif // VARIANT_H
