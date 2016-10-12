@@ -14,31 +14,16 @@ namespace detail{
     template <typename T>
     using Invoke = typename T::type;
 
-    template <typename If, typename Then, typename Else>
-    using Conditional = Invoke<std::conditional<If::value, Then, Else>>;
-
-    // Logical conjunction metafunction
-    template <typename... T>
-    struct All : std::true_type {};
-
-    template <typename Head, typename... Tail>
-    struct All<Head, Tail...> : Conditional<Head, All<Tail...>, std::false_type> {};
-
-  //  enum class enabled {}; // no value necessary
-
-    enum class enabled { _ }; // just a type that can be used as a template parameter
-    constexpr auto _dummy = enabled::_; // shortcut for dummy value
 
     template <typename BoolCondition>
-    using EnableIf = Invoke<std::enable_if<BoolCondition::value, enabled> >;
+    using EnableIf = Invoke<std::enable_if<BoolCondition::value> >;
 
 
     template <typename T>
     struct is_integer : std::integral_constant<bool, std::is_integral<T>::value
                                                          && !std::is_same<T, bool>::value
                                                          && !std::is_same<T, char>::value>
-    {
-    };
+    {};
 
     template <typename From, typename To>
     struct is_safe_integer_conversion
@@ -46,8 +31,7 @@ namespace detail{
                                            && detail::is_integer<To>::value
                                            && sizeof(From) <= sizeof(To)
                                            && std::is_signed<From>::value == std::is_signed<To>::value>
-    {
-    };
+    {};
 
     template <typename From, typename To>
     struct unsigned_to_smaller_conversion
@@ -56,8 +40,7 @@ namespace detail{
                                     && (sizeof(From) > sizeof(To))
                                     && !std::is_signed<From>::value
                                     && !std::is_signed<To>::value >
-    {
-    };
+    {};
 
     template <typename From, typename To>
     struct signed_to_smaller_conversion
@@ -66,8 +49,7 @@ namespace detail{
                                     && (sizeof(From) > sizeof(To))
                                     && std::is_signed<From>::value
                                     && std::is_signed<To>::value >
-    {
-    };
+    {};
 
     //---------------------------
     template <typename From, typename To>
@@ -77,8 +59,7 @@ namespace detail{
                                     && sizeof(From) >= sizeof(To)
                                     && std::is_signed<From>::value
                                     && !std::is_signed<To>::value >
-    {
-    };
+    {};
 
     template <typename From, typename To>
     struct signed_to_larger_unsigned_conversion
@@ -87,8 +68,7 @@ namespace detail{
                                     && sizeof(From) < sizeof(To)
                                     && std::is_signed<From>::value
                                     && !std::is_signed<To>::value >
-    {
-    };
+    {};
 
     template <typename From, typename To>
     struct unsigned_to_smaller_signed_conversion
@@ -97,8 +77,7 @@ namespace detail{
                                     && (sizeof(From) >= sizeof(To))
                                     && !std::is_signed<From>::value
                                     && std::is_signed<To>::value >
-    {
-    };
+    {};
 
     template <typename From, typename To>
     struct unsigned_to_larger_signed_conversion
@@ -107,31 +86,27 @@ namespace detail{
                                     && sizeof(From) < sizeof(To)
                                     && !std::is_signed<From>::value
                                     && std::is_signed<To>::value >
-    {
-    };
+    {};
 
     template <typename From, typename To>
     struct floating_to_signed_conversion
         : std::integral_constant<bool, std::is_floating_point<From>::value
                                     && detail::is_integer<To>::value
                                     && std::is_signed<To>::value >
-    {
-    };
+    {};
 
     template <typename From, typename To>
     struct floating_to_unsigned_conversion
         : std::integral_constant<bool, std::is_floating_point<From>::value
                                     && detail::is_integer<To>::value
                                     && !std::is_signed<To>::value >
-    {
-    };
-
+    {};
 }
 
 //----------------------- Implementation ----------------------------------------------
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::is_safe_integer_conversion<SRC, DST>> = detail::_dummy  >
+         typename detail::EnableIf< detail::is_safe_integer_conversion<SRC, DST>>* = nullptr >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     return from;
@@ -139,7 +114,7 @@ FORCE_INLINE DST convert_impl( const SRC& from)
 
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::unsigned_to_smaller_conversion<SRC, DST>> = detail::_dummy  >
+         typename detail::EnableIf< detail::unsigned_to_smaller_conversion<SRC, DST>>* = nullptr  >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if (from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
@@ -148,7 +123,7 @@ FORCE_INLINE DST convert_impl( const SRC& from)
 }
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::signed_to_smaller_conversion<SRC, DST>> = detail::_dummy  >
+        typename  detail::EnableIf< detail::signed_to_smaller_conversion<SRC, DST>>* = nullptr  >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if (from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
@@ -162,7 +137,7 @@ FORCE_INLINE DST convert_impl( const SRC& from)
 
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::signed_to_smaller_unsigned_conversion<SRC, DST>> = detail::_dummy  >
+         typename detail::EnableIf< detail::signed_to_smaller_unsigned_conversion<SRC, DST>>* = nullptr  >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if (from < 0 )
@@ -176,7 +151,7 @@ FORCE_INLINE DST convert_impl( const SRC& from)
 
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::signed_to_larger_unsigned_conversion<SRC, DST>> = detail::_dummy   >
+         typename detail::EnableIf< detail::signed_to_larger_unsigned_conversion<SRC, DST>>* = nullptr   >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if ( from < 0 )
@@ -185,14 +160,14 @@ FORCE_INLINE DST convert_impl( const SRC& from)
 }
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::unsigned_to_larger_signed_conversion<SRC, DST>> = detail::_dummy   >
+         typename detail::EnableIf< detail::unsigned_to_larger_signed_conversion<SRC, DST>>* = nullptr   >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     return from;
 }
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::unsigned_to_smaller_signed_conversion<SRC, DST>> = detail::_dummy   >
+         typename detail::EnableIf< detail::unsigned_to_smaller_signed_conversion<SRC, DST>>* = nullptr   >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if ( from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
@@ -201,7 +176,7 @@ FORCE_INLINE DST convert_impl( const SRC& from)
 }
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::floating_to_signed_conversion<SRC, DST>> = detail::_dummy   >
+         typename detail::EnableIf< detail::floating_to_signed_conversion<SRC, DST>>* = nullptr   >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if (from > (std::numeric_limits<DST>::max()) ||
@@ -215,7 +190,7 @@ FORCE_INLINE DST convert_impl( const SRC& from)
 }
 
 template<typename SRC,typename DST,
-         detail::EnableIf< detail::floating_to_unsigned_conversion<SRC, DST>> = detail::_dummy   >
+         typename detail::EnableIf< detail::floating_to_unsigned_conversion<SRC, DST>>* = nullptr   >
 FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if ( from <0 || from > std::numeric_limits<DST>::max())
