@@ -3,6 +3,18 @@
 
 #include <stdint.h>
 
+#ifndef FORCE_INLINE
+    #ifdef __GNUC__
+        #define FORCE_INLINE [[gnu::always_inline]] inline
+    #elif defined(_MSC_VER)
+        #define FORCE_INLINE __forceinline
+    #else
+        /// Strong hint to the compiler to inline a function.
+        /// Define it yourself prior to including the header to override it.
+        #define FORCE_INLINE inline
+    #endif
+#endif
+
 typedef enum {
 
     UNKNOWN_TYPE  = 0,

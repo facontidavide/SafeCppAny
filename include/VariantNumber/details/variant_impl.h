@@ -1,6 +1,14 @@
 #ifndef VARIANT_IMPL_H
 #define VARIANT_IMPL_H
 
+#include <type_traits>
+#include <limits>
+#include "VariantNumber/typeid.h"
+#include "VariantNumber/details/exceptions.h"
+
+namespace VariantNumber
+{
+
 namespace detail{
 
     template <typename T>
@@ -18,8 +26,8 @@ namespace detail{
 
   //  enum class enabled {}; // no value necessary
 
-    enum class enabled { _ }; // just a type that can be used as a template parameter and is as inocuous as possible
-    constexpr auto _dummy = enabled::_; // shortcut for dummy value (do not place _ in global scope!)
+    enum class enabled { _ }; // just a type that can be used as a template parameter
+    constexpr auto _dummy = enabled::_; // shortcut for dummy value
 
     template <typename BoolCondition>
     using EnableIf = Invoke<std::enable_if<BoolCondition::value, enabled> >;
@@ -124,7 +132,7 @@ namespace detail{
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::is_safe_integer_conversion<SRC, DST>> = detail::_dummy  >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     return from;
 }
@@ -132,7 +140,7 @@ DST convert_impl( const SRC& from)
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::unsigned_to_smaller_conversion<SRC, DST>> = detail::_dummy  >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if (from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
         throw RangeException("Value larger than maximum limit");
@@ -141,7 +149,7 @@ DST convert_impl( const SRC& from)
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::signed_to_smaller_conversion<SRC, DST>> = detail::_dummy  >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if (from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
         throw RangeException("Value larger than maximum limit");
@@ -155,7 +163,7 @@ DST convert_impl( const SRC& from)
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::signed_to_smaller_unsigned_conversion<SRC, DST>> = detail::_dummy  >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if (from < 0 )
         throw RangeException("Value is negative and can't be converted to signed");
@@ -169,7 +177,7 @@ DST convert_impl( const SRC& from)
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::signed_to_larger_unsigned_conversion<SRC, DST>> = detail::_dummy   >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if ( from < 0 )
         throw RangeException("Value is negative and can't be converted to signed");
@@ -178,14 +186,14 @@ DST convert_impl( const SRC& from)
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::unsigned_to_larger_signed_conversion<SRC, DST>> = detail::_dummy   >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     return from;
 }
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::unsigned_to_smaller_signed_conversion<SRC, DST>> = detail::_dummy   >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if ( from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
         throw RangeException("Value larger than maximum limit");
@@ -194,7 +202,7 @@ DST convert_impl( const SRC& from)
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::floating_to_signed_conversion<SRC, DST>> = detail::_dummy   >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if (from > (std::numeric_limits<DST>::max()) ||
         from < (std::numeric_limits<DST>::min()) )
@@ -208,7 +216,7 @@ DST convert_impl( const SRC& from)
 
 template<typename SRC,typename DST,
          detail::EnableIf< detail::floating_to_unsigned_conversion<SRC, DST>> = detail::_dummy   >
-DST convert_impl( const SRC& from)
+FORCE_INLINE DST convert_impl( const SRC& from)
 {
     if ( from <0 || from > std::numeric_limits<DST>::max())
         throw RangeException("Value out of range");
@@ -220,7 +228,8 @@ DST convert_impl( const SRC& from)
 }
 
 
-template<typename DST> DST VarNumber::convert()
+template<typename DST>
+inline DST VarNumber::convert()
 {
     switch( _raw_data[8] )
     {
@@ -240,10 +249,10 @@ template<typename DST> DST VarNumber::convert()
     default:  throw TypeException("ops");
 
     }
-    return  apply_visitor(convert_to_int8() );
+    return  DST();
 }
 
-
+} //end namespace
 
 #endif // VARIANT_H
 
