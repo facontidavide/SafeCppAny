@@ -35,6 +35,12 @@ struct is_safe_integer_conversion
 {};
 
 template <typename From, typename To>
+struct float_conversion
+        : std::integral_constant<bool, std::is_floating_point<From>::value
+        && std::is_floating_point<To>::value >
+{};
+
+template <typename From, typename To>
 struct unsigned_to_smaller_conversion
         : std::integral_constant<bool, detail::is_integer<From>::value
         && detail::is_integer<To>::value
@@ -102,15 +108,74 @@ struct floating_to_unsigned_conversion
         && detail::is_integer<To>::value
         && !std::is_signed<To>::value >
 {};
+
+template <typename From, typename To>
+struct integer_to_floating_conversion
+        : std::integral_constant<bool, detail::is_integer<From>::value
+        && std::is_floating_point<To>::value >
+{};
+
+template <typename From, typename To>
+FORCE_INLINE void checkUpperLimit(const From& from)
+{
+    if ((sizeof(To) < sizeof(From)) &&
+        (from > static_cast<From>(std::numeric_limits<To>::max()))) {
+        throw RangeException("Value too large.");
+    }
+    else if (static_cast<To>(from) > std::numeric_limits<To>::max()) {
+        throw RangeException("Value too large.");
+    }
+}
+
+template <typename From, typename To>
+FORCE_INLINE void checkUpperLimitFloat(const From& from)
+{
+    if (from > std::numeric_limits<To>::max())
+        throw RangeException("Value too large.");
+}
+
+template <typename From, typename To>
+FORCE_INLINE void checkLowerLimitFloat(const From& from)
+{
+    if (from < -std::numeric_limits<To>::max())
+        throw RangeException("Value too small.");
+}
+
+template <typename From, typename To>
+FORCE_INLINE void checkLowerLimit(const From& from)
+{
+    if (from < std::numeric_limits<To>::min())
+        throw RangeException("Value too small.");
+}
+
+template <typename From, typename To>
+FORCE_INLINE void checkTruncation(const From& from)
+{
+    if( from != static_cast<From>(static_cast<To>( from)))
+        throw RangeException("Floating point truncated");
+}
+
 }
 
 //----------------------- Implementation ----------------------------------------------
+
+
+
 
 template<typename SRC,typename DST,
          typename detail::EnableIf< detail::is_safe_integer_conversion<SRC, DST>>* = nullptr >
 FORCE_INLINE void convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "is_safe_integer_conversion" << std::endl;
+    target = static_cast<DST>( from);
+}
+
+template<typename SRC,typename DST,
+         typename detail::EnableIf< detail::float_conversion<SRC, DST>>* = nullptr >
+FORCE_INLINE void convert_impl( const SRC& from, DST& target )
+{
+    //std::cout << "float_conversion" << std::endl;
+    detail::checkTruncation<SRC,DST>(from);
     target = static_cast<DST>( from);
 }
 
@@ -121,9 +186,7 @@ FORCE_INLINE void convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "unsigned_to_smaller_conversion" << std::endl;
 
-    if ( from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
-        throw RangeException("Value larger than maximum limit");
-
+    detail::checkUpperLimit<SRC,DST>(from);
     target = static_cast<DST>( from);
 }
 
@@ -132,13 +195,8 @@ template<typename SRC,typename DST,
 FORCE_INLINE void convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "signed_to_smaller_conversion" << std::endl;
-
-    if ( from < static_cast<SRC>(std::numeric_limits<DST>::min()) )
-        throw RangeException("Value smaller than minum limit");
-
-    if ( from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
-        throw RangeException("Value larger than maximum limit");
-
+    detail::checkLowerLimit<SRC,DST>(from);
+    detail::checkUpperLimit<SRC,DST>(from);
     target = static_cast<DST>( from);
 }
 
@@ -148,11 +206,10 @@ template<typename SRC,typename DST,
 FORCE_INLINE void convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "signed_to_smaller_unsigned_conversion" << std::endl;
-     if (from < static_cast<SRC>(std::numeric_limits<DST>::min()) )
+    if (from < 0 )
         throw RangeException("Value is negative and can't be converted to signed");
 
-    if (from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
-        throw RangeException("Value larger than maximum limit");
+    detail::checkUpperLimit<SRC,DST>(from);
 
     target = static_cast<DST>( from);
 }
@@ -166,6 +223,7 @@ FORCE_INLINE void convert_impl( const SRC& from, DST& target )
 
     if ( from < 0 )
         throw RangeException("Value is negative and can't be converted to signed");
+
     target = static_cast<DST>( from);
 }
 
@@ -183,8 +241,7 @@ FORCE_INLINE void convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "unsigned_to_smaller_signed_conversion" << std::endl;
 
-    if ( from > static_cast<SRC>(std::numeric_limits<DST>::max()) )
-        throw RangeException("Value larger than maximum limit");
+    detail::checkUpperLimit<SRC,DST>(from);
     target = static_cast<DST>( from);
 }
 
@@ -194,9 +251,8 @@ FORCE_INLINE void convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "floating_to_signed_conversion" << std::endl;
 
-    if (from > (std::numeric_limits<DST>::max()) ||
-             from < (std::numeric_limits<DST>::min()) )
-        throw RangeException("Floating point out of range");
+    detail::checkLowerLimitFloat<SRC,DST>(from);
+    detail::checkLowerLimitFloat<SRC,DST>(from);
 
     if( from != static_cast<SRC>(static_cast<DST>( from)))
         throw RangeException("Floating point truncated");
@@ -209,12 +265,24 @@ template<typename SRC,typename DST,
 FORCE_INLINE void convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "floating_to_unsigned_conversion" << std::endl;
-    if ( from <0 || from > std::numeric_limits<DST>::max())
-        throw RangeException("Value out of range");
+    if ( from < 0 )
+        throw RangeException("Value is negative and can't be converted to signed");
+
+    detail::checkLowerLimitFloat<SRC,DST>(from);
 
     if( from != static_cast<SRC>(static_cast<DST>( from)))
         throw RangeException("Floating point truncated");
 
+    target = static_cast<DST>( from);
+}
+
+template<typename SRC,typename DST,
+         typename detail::EnableIf< detail::integer_to_floating_conversion<SRC, DST>>* = nullptr   >
+FORCE_INLINE void convert_impl( const SRC& from, DST& target )
+{
+    //std::cout << "floating_to_unsigned_conversion" << std::endl;
+
+    detail::checkTruncation<SRC,DST>(from);
     target = static_cast<DST>( from);
 }
 
@@ -243,7 +311,6 @@ FORCE_INLINE DST VarNumber::convert()
     default:  throw TypeException("ops"); break;
 
     }
-
     return  target;
 }
 

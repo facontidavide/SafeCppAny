@@ -34,17 +34,26 @@ TEST_CASE( "Convert To larger", "[int]" )
 {
     using namespace VariantNumber;
 
-    VarNumber num( (int8_t) 42 );
+    {
+        VarNumber num( (int8_t) 42 );
+        REQUIRE( num.convert<int16_t>() == 42);
+        REQUIRE( num.convert<int32_t>() == 42);
+        REQUIRE( num.convert<float>() == 42);
+    }
 
-    REQUIRE( num.convert<unsigned>() == 42);
-  /*  REQUIRE( num.convert<int16_t>() == 42);
+    {
+        VarNumber num( (int8_t) -42 );
+        REQUIRE( num.convert<int16_t>() == -42);
+        REQUIRE( num.convert<int32_t>() == -42);
+        REQUIRE( num.convert<float>() == -42);
+    }
 
-    REQUIRE( num.convert<uint32_t>() == 42);
-    REQUIRE( num.convert<int32_t>() == 42);
+    {
+        VarNumber num( (uint8_t) 42 );
 
-    REQUIRE( num.convert<uint64_t>() == 42);
-    REQUIRE( num.convert<int64_t>() == 42);*/
-
+        REQUIRE( num.convert<uint16_t>() == 42);
+        REQUIRE( num.convert<int16_t>() == 42);
+    }
 }
 
 
