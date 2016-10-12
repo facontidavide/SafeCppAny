@@ -2,6 +2,7 @@
 #define VARIANT_H
 
 #include <type_traits>
+#include <limits>
 #include "VariantNumber/typeid.h"
 #include "VariantNumber/details/exceptions.h"
 
