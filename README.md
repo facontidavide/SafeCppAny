@@ -1,6 +1,9 @@
-# SafeVariantNumber
+# std::any with small object optimization and safe numerical conversion
+
 The purpose of this tiny header-only library is to provide a type called SafeVariantNumber which can hold any integral or floating point number.
 Additionally, it provides a safe way to convert a value between the original type and a different one.
+
+It is a relatively simple extension of this library [thelink2012/any](https://github.com/thelink2012/any).
 
 In short:
 

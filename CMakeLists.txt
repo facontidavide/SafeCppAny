@@ -1,4 +1,4 @@
-project(SafeVariadicNumber)
+project(AnyNumber)
 cmake_minimum_required(VERSION 2.8)
 
 add_compile_options(-std=c++11)
@@ -12,25 +12,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-find_package(PocoLib)
 find_package(benchmark)
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/include )
 
-
-
-if( POCO_FOUND AND BENCHMARK_FOUND )
-
-    message("building the benckmark")
-
-    add_executable(benchmark_variant benchmark/benchmark.cpp )
-    TARGET_LINK_LIBRARIES( benchmark_variant    benchmark pthread  PocoFoundation )
-
-endif()
-
-
-
-add_executable(test test/test_variantnumber.cpp )
+add_executable(anynumber_test test/test_safeany.cpp )
 TARGET_LINK_LIBRARIES( test  )
 
 

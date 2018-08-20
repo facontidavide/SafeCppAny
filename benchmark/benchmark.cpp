@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include "VariantNumber/variant.h"
+#include "VariantNumber/varnumber.h"
 #include <Poco/DynamicAny.h>
 
 #include <string>
@@ -9,13 +9,13 @@
 
 #define MAX 1000
 
-using namespace VariantNumber;
+using namespace VarNumber;
 
 //-----------------------------------------------
 
 static void BM_VariantAssign(benchmark::State& state)
 {
-    VarNumber a;
+    Any a;
 
     while (state.KeepRunning())
     {
@@ -29,7 +29,7 @@ static void BM_VariantAssign(benchmark::State& state)
 
 static void BM_VariantExtract(benchmark::State& state)
 {
-    VarNumber a = (int32_t)42;
+    Any a = (int32_t)42;
     int64_t total = 0;
 
     while (state.KeepRunning())
@@ -43,7 +43,7 @@ static void BM_VariantExtract(benchmark::State& state)
 
 static void BM_VariantConvert(benchmark::State& state)
 {
-    VarNumber a = (int32_t)42;
+    Any a = (int32_t)42;
     int64_t total = 0;
 
     while (state.KeepRunning())
