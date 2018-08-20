@@ -35,14 +35,14 @@ TEST_CASE( "Convert To larger", "[int]" )
         Any num( (int8_t) 42 );
         REQUIRE( num.convert<int16_t>() == 42);
         REQUIRE( num.convert<int32_t>() == 42);
-        REQUIRE( num.convert<float>() == 42);
+        REQUIRE( num.convert<float>() == 42.0f);
     }
 
     {
         Any num( (int8_t) -42 );
         REQUIRE( num.convert<int16_t>() == -42);
         REQUIRE( num.convert<int32_t>() == -42);
-        REQUIRE( num.convert<float>() == -42);
+        REQUIRE( num.convert<float>() == -42.0f);
     }
 
     {

@@ -93,13 +93,9 @@ template <> inline std::string Any::extract() const
 
 namespace details{
 
-template <typename T>
-using Invoke = typename T::type;
-
 
 template <typename BoolCondition>
-using EnableIf = Invoke<std::enable_if<BoolCondition::value> >;
-
+using EnableIf = typename std::enable_if< BoolCondition::value, void>::type;
 
 template <typename T>
 struct is_integer : std::integral_constant<bool, std::is_integral<T>::value
@@ -118,8 +114,19 @@ template <typename From, typename To>
 struct is_safe_integer_conversion
         : std::integral_constant<bool, is_integer<From>::value
         && is_integer<To>::value
-        && sizeof(From) <= sizeof(To)
+        && sizeof(From) < sizeof(To)
 && std::is_signed<From>::value == std::is_signed<To>::value>
+{};
+
+template <typename T>
+struct is_convertible_type
+        : std::integral_constant<bool,
+           std::is_integral<T>::value
+        || std::is_floating_point<T>::value
+        || std::is_same<T, bool>::value
+        || std::is_same<T, char>::value
+        || std::is_same<T, std::string>::value
+        || std::is_same<T, SimpleString>::value>
 {};
 
 template <typename From, typename To>
@@ -250,42 +257,48 @@ inline void checkTruncation(const From& from)
 
 //----------------------- Implementation ----------------------------------------------
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::is_same_real<SRC, DST>>* = nullptr >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+typename std::enable_if< !is_convertible_type<DST>::value, void>::type
+convert_impl( const SRC& , DST&  )
+{
+    throw std::runtime_error("Not convertible");
+}
+
+
+template<typename SRC,typename DST> inline
+EnableIf< std::is_same<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
     target = from;
 }
 
-
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::is_safe_integer_conversion<SRC, DST>>* = nullptr >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< is_safe_integer_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
-    //std::cout << "is_safe_integer_conversion" << std::endl;
     target = static_cast<DST>( from);
 }
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::float_conversion<SRC, DST>>* = nullptr >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< float_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
     checkTruncation<SRC,DST>(from);
     target = static_cast<DST>( from );
 }
 
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::unsigned_to_smaller_conversion<SRC, DST>>* = nullptr  >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< unsigned_to_smaller_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
     checkUpperLimit<SRC,DST>(from);
     target = static_cast<DST>( from);
 }
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::signed_to_smaller_conversion<SRC, DST>>* = nullptr  >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< signed_to_smaller_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
     checkLowerLimit<SRC,DST>(from);
     checkUpperLimit<SRC,DST>(from);
@@ -293,9 +306,9 @@ inline void convert_impl( const SRC& from, DST& target )
 }
 
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::signed_to_smaller_unsigned_conversion<SRC, DST>>* = nullptr  >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< signed_to_smaller_unsigned_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
     if (from < 0 )
         throw std::runtime_error("Value is negative and can't be converted to signed");
@@ -305,9 +318,9 @@ inline void convert_impl( const SRC& from, DST& target )
 }
 
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::signed_to_larger_unsigned_conversion<SRC, DST>>* = nullptr   >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< signed_to_larger_unsigned_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "signed_to_larger_unsigned_conversion" << std::endl;
 
@@ -317,30 +330,26 @@ inline void convert_impl( const SRC& from, DST& target )
     target = static_cast<DST>( from);
 }
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::unsigned_to_larger_signed_conversion<SRC, DST>>* = nullptr   >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< unsigned_to_larger_signed_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
     //std::cout << "unsigned_to_larger_signed_conversion" << std::endl;
     target = static_cast<DST>( from);
 }
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::unsigned_to_smaller_signed_conversion<SRC, DST>>* = nullptr   >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< unsigned_to_smaller_signed_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
-    //std::cout << "unsigned_to_smaller_signed_conversion" << std::endl;
-
     checkUpperLimit<SRC,DST>(from);
     target = static_cast<DST>( from);
 }
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::floating_to_signed_conversion<SRC, DST>>* = nullptr   >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< floating_to_signed_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
-    //std::cout << "floating_to_signed_conversion" << std::endl;
-
     checkLowerLimitFloat<SRC,DST>(from);
     checkLowerLimitFloat<SRC,DST>(from);
 
@@ -350,9 +359,9 @@ inline void convert_impl( const SRC& from, DST& target )
     target = static_cast<DST>( from);
 }
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::floating_to_unsigned_conversion<SRC, DST>>* = nullptr   >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< floating_to_unsigned_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
     if ( from < 0 )
         throw std::runtime_error("Value is negative and can't be converted to signed");
@@ -365,12 +374,10 @@ inline void convert_impl( const SRC& from, DST& target )
     target = static_cast<DST>( from);
 }
 
-template<typename SRC,typename DST,
-         typename details::EnableIf< details::integer_to_floating_conversion<SRC, DST>>* = nullptr >
-inline void convert_impl( const SRC& from, DST& target )
+template<typename SRC,typename DST> inline
+EnableIf< integer_to_floating_conversion<SRC, DST>>
+convert_impl( const SRC& from, DST& target )
 {
-    //std::cout << "floating_to_unsigned_conversion" << std::endl;
-
     checkTruncation<SRC,DST>(from);
     target = static_cast<DST>( from);
 }
@@ -381,16 +388,21 @@ inline void convert_impl( const SRC& from, DST& target )
 template<typename DST> inline
 DST Any::convert() const
 {
-    using namespace details;
+    using details::convert_impl;
     DST out;
 
     const auto& type = _any.type();
+
+    if( ! details::is_convertible_type<DST>::value )
+    {
+        return linb::any_cast<DST>(_any);
+    }
 
     if( type == typeid(bool)) {
         return DST( extract<bool>() );
     }
     else if( type == typeid(char)) {
-        convert_impl<int8_t,  DST>(extract<char>(), out  );
+        convert_impl<int8_t,  DST>( int8_t(extract<char>()), out  );
     }
     else if( type == typeid(int8_t)) {
         convert_impl<int8_t,  DST>(extract<int8_t>(), out  );
@@ -477,7 +489,6 @@ template<> inline std::string Any::convert() const
     else if( type == typeid(double)) {
         return std::to_string( extract<double>() );
     }
-
 
     throw std::runtime_error("Conversion to std::string failed");
 }
