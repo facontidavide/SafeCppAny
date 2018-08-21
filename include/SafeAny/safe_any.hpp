@@ -14,7 +14,7 @@
 namespace SafeAny{
 
 
-// Rational: since numbers will always use at least 8 bytes
+// Rational: since type erased numbers will always use at least 8 bytes
 // it is faster to cast everything to either double, uint64_t or int64_t.
 class Any
 {
@@ -49,24 +49,23 @@ public:
 
     Any(const uint64_t& value) : _any(value) { }
 
-    Any(const int64_t& value) : _any(value) { }
-
     Any(const float& value) : _any( double(value) ) { }
 
-    Any(const std::string& str)
-    {
-        _any = linb::any(SimpleString(str));
-    }
+    Any(const std::string& str) :  _any(SimpleString(str)) { }
 
+    // all the other integrals are casted to int64_t
     template<typename T>
     explicit Any(const T& value, EnableIntegral<T> = 0):
         _any( int64_t(value) ) { }
 
+    // default for other custom types
     template<typename T>
     explicit Any(const T& value, EnableNonIntegral<T> = 0):
         _any( value ) { }
 
 
+    // this is different from any_cast, because if allows safe
+    // conversions between arithmetic values.
     template<typename T> T cast() const
     {
         if( _any.type() == typeid (T) )
