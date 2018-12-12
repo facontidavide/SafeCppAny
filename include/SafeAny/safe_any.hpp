@@ -9,11 +9,11 @@
 #include <cstring>
 #include <type_traits>
 #include "any.hpp"
+#include "demangle_util.h"
 #include "convert_impl.hpp"
 
-namespace SafeAny{
-
-
+namespace SafeAny
+{
 // Rational: since type erased numbers will always use at least 8 bytes
 // it is faster to cast everything to either double, uint64_t or int64_t.
 class Any
@@ -77,8 +77,12 @@ public:
         }
     }
 
-private:
+    const std::type_info& type() const noexcept
+    {
+        return _any.type();
+    }
 
+  private:
     linb::any _any;
 
     //----------------------------
@@ -161,17 +165,12 @@ private:
     {
         char buffer[1024];
         sprintf(buffer, "[Any::convert]: no known safe conversion between %s and %s",
-                _any.type().name(), typeid (T).name() );
+                BT::demangle( _any.type().name() ).c_str(),
+                BT::demangle( typeid(T).name() ).c_str() );
         return std::runtime_error(buffer);
     }
-
 };
 
+}   // end namespace VarNumber
 
-
-
-
-} // end namespace VarNumber
-
-
-#endif // VARNUMBER_H
+#endif   // VARNUMBER_H
